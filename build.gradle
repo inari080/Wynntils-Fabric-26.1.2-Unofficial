@@ -1,0 +1,155 @@
+plugins {
+    id "architectury-plugin" version "${architectury_plugin_version}"
+    id "dev.architectury.loom-no-remap" version "${architectury_loom_version}" apply false
+    id "com.diffplug.spotless" version "${spotless_version}"
+}
+
+architectury {
+    minecraft = minecraft_version
+}
+
+// Add "wynntils.hotswap=true" to your personal gradle properties file to use hotswap.
+// By default, this is C:\Users\<your username>\.gradle\gradle.properties on Windows
+// or ~/.gradle/gradle.properties on Linux/MacOS.
+def usingHotswapAgent = project.hasProperty("wynntils.hotswap") ? project.getProperty("wynntils.hotswap") == "true" : false
+
+// On the release branches, this string will be automatically updated by the bots
+// Do not change this in the main branch!
+version = "4.2.13"
+
+subprojects {
+    apply plugin: "dev.architectury.loom-no-remap"
+
+    repositories {
+        maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
+        maven { url = "https://jitpack.io" }
+    }
+
+    loom {
+        accessWidenerPath = file("${rootDir}/common/src/main/resources/wynntils.accessWidener")
+
+        runs {
+            client {
+                if (usingHotswapAgent) {
+                    vmArgs "-XX:+AllowEnhancedClassRedefinition"
+                    // https://youtrack.jetbrains.com/issue/JBR-7351/JVM-CodeCache-will-not-be-cleaned-using-G1GC-if-Hotswap-Agent-is-enabled-since-JBR-6419-jbr21.351
+                    vmArgs "-XX:+ClassUnloading"
+                    vmArgs "-XX:HotswapAgent=fatjar"
+                }
+                vmArgs "-ea" // run dev builds with asserts
+                vmArgs "-Ddevauth.enabled=true" // enable devauth
+                vmArgs "-Ddevauth.account=main"
+                client()
+            }
+        }
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${minecraft_version}"
+    }
+}
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "architectury-plugin"
+    apply plugin: "com.diffplug.spotless"
+
+    base {
+        archivesName = archives_base_name
+    }
+    version = rootProject.version
+
+    repositories {
+        maven { url "https://maven.parchmentmc.org/" }
+        maven { url "https://jitpack.io" }
+    }
+
+    // Minecraft's development runtime metadata lists every Linux epoll native,
+    // including a classifier that is not published. It is not needed on Windows.
+    configurations.configureEach {
+        exclude group: "io.netty", module: "netty-transport-native-epoll"
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+    }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(java_version))
+        }
+        withSourcesJar()
+    }
+
+    spotless {
+        java {
+            // define the steps to apply to Java source code
+            importOrder()
+            removeUnusedImports()
+            palantirJavaFormat(spotless_palantir_version)
+            trimTrailingWhitespace()
+            endWithNewline()
+            toggleOffOn()
+            // Custom rule from https://github.com/apache/geode
+            custom "Refuse wildcard imports", {
+                if (it =~ /\nimport .*\*;/) {
+                    throw new AssertionError("Do not use wildcard imports. 'spotlessApply' cannot resolve this issue.")
+                }
+            }
+            custom "Refuse IntelliJ annotations", {
+                if (it =~ /\nimport org\.jetbrains\.annotations\./) {
+                    throw new AssertionError("Do not use IntelliJ annotations. 'spotlessApply' cannot resolve this issue.")
+                }
+            }
+            custom "No empty line after opening curly brace", {
+                it.replaceAll(/\{\n\n/, '{\n')
+            }
+            licenseHeader("/*\n" +
+                    " * Copyright © Wynntils \$YEAR.\n" +
+                    " * This file is released under LGPLv3. See LICENSE for full license details.\n" +
+                    " */")
+                    .updateYearWithLatest(true)
+        }
+        json {
+            target "src/**/*.json"
+            /*
+             1. spotless replaces the Unicode escapes with the actual characters, worsening readability.
+             2. schemaVersion must be at the top or else Fabric will complain
+             */
+            targetExclude(
+                    "src/main/resources/assets/wynntils/font/**/*.json",
+                    "src/main/resources/assets/wynntils/fontmaps/*.json",
+                    "src/main/resources/fabric.mod.json")
+            gson()
+                    .indentWithSpaces(2)
+                    .sortByKeys()
+                    .version(spotless_gson_version)
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+        format "lang", {
+            target "src/main/resources/assets/wynntils/lang/*.json"
+            custom "No empty language json files", {
+                it.replaceAll(/^\{\}\n$/, '')
+            }
+        }
+        groovyGradle {
+            target '**/*.gradle'
+            trimTrailingWhitespace()
+            leadingTabsToSpaces(4)
+            endWithNewline()
+        }
+
+        format "misc", {
+            ratchetFrom('origin/main')
+            // define the files to apply `misc` to
+            target "*.gradle", "*.md", ".gitignore", "*.properties"
+            targetExclude("CHANGELOG.md")
+
+            // define the steps to apply to those files
+            trimTrailingWhitespace()
+            leadingTabsToSpaces()
+            endWithNewline()
+        }
+    }
+}

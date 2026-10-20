@@ -1,0 +1,58 @@
+/*
+ * Copyright © Wynntils 2022-2026.
+ * This file is released under LGPLv3. See LICENSE for full license details.
+ */
+package com.wynntils.models.emeralds.type;
+
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+public enum EmeraldUnits {
+    EMERALD(Items.EMERALD, "Emerald", "\u00B2", 1),
+    EMERALD_BLOCK(Items.EMERALD_BLOCK, "Emerald Block", "\u00B2\u00BD", 64),
+    LIQUID_EMERALD(Items.EXPERIENCE_BOTTLE, "Liquid Emerald", "\u00BC\u00B2", 64 * 64),
+    LIQUID_EMERALD_STX(Items.EXPERIENCE_BOTTLE, "Stack of Liquid Emeralds", "stx", 64 * 64 * 64);
+
+    private final Item itemType;
+    private final String displayName;
+    private final String symbol;
+    private final int multiplier;
+
+    EmeraldUnits(Item itemType, String displayName, String symbol, int multiplier) {
+        this.itemType = itemType;
+        this.displayName = displayName;
+        this.symbol = symbol;
+        this.multiplier = multiplier;
+    }
+
+    public Item getItemType() {
+        return itemType;
+    }
+
+    public ItemStack getItemStack() {
+        // Minecraft 26 binds data components after mod entrypoints run. Construct stacks lazily.
+        return new ItemStack(itemType);
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public int getMultiplier() {
+        return multiplier;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public static EmeraldUnits fromItemType(Item itemType) {
+        for (EmeraldUnits unit : values()) {
+            if (unit.getItemType() == itemType) {
+                return unit;
+            }
+        }
+        return null;
+    }
+}
