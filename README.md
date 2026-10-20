@@ -8,7 +8,7 @@ Minecraft 26.1.2のFabric環境で起動し、Wynncraftへ接続して通常プ�
 
 ## ダウンロードと導入
 
-現在、ビルド済みJARはGitHub Releasesでは配布していません。以下の手順でソースからビルドしてください。
+ビルド済みJARは[GitHub Releasesからダウンロード](https://github.com/inari080/Wynntils-Fabric-26.1.2-Unofficial/releases/download/v4.2.13-fabric-mc26.1.2-preview.1/wynntils-4.2.13-fabric+MC-26.1.2.jar)できます。直接JARを使う場合は手順4へ進んでください。ソースからビルドする場合はJava 25が必要です。
 
 1. Java 25をインストールします。
 2. このリポジトリをGitHubの **Code → Download ZIP** から取得して展開します。
@@ -47,4 +47,4 @@ WynntilsはGNU Lesser General Public License v3.0 onlyでライセンスされ�
 
 ## English summary
 
-Unofficial Fabric port of Wynntils 4.2.13 for Minecraft 26.1.2. It has been launched and used for normal Wynncraft gameplay, but not every feature has been exhaustively tested. No prebuilt JAR is currently published; build with Java 25 using `:fabric:shadowJar`. See the Japanese instructions above. This project is not affiliated with Team Wynntils; see the upstream repository and included LGPL-3.0-only license for attribution and license terms.
+Unofficial Fabric port of Wynntils 4.2.13 for Minecraft 26.1.2. It has been launched and used for normal Wynncraft gameplay, but not every feature has been exhaustively tested. A preview JAR is available from [GitHub Releases](https://github.com/inari080/Wynntils-Fabric-26.1.2-Unofficial/releases/download/v4.2.13-fabric-mc26.1.2-preview.1/wynntils-4.2.13-fabric+MC-26.1.2.jar); build from source with Java 25 using `:fabric:shadowJar`. See the Japanese instructions above. This project is not affiliated with Team Wynntils; see the upstream repository and included LGPL-3.0-only license for attribution and license terms.
