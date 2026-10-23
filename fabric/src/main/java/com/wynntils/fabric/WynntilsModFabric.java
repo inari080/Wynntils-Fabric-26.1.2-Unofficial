@@ -27,8 +27,8 @@ public class WynntilsModFabric implements ClientModInitializer {
                 wynntilsMod.get().getMetadata().getVersion().getFriendlyString(),
                 FabricLoader.getInstance().isDevelopmentEnvironment(),
                 new File(wynntilsMod.get().getOrigin().getPaths().getFirst().toUri()));
+        WynntilsMod.initializePrepared();
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            WynntilsMod.initializePrepared();
             client.options.load();
             if (Services.ResourcePack.preloadResourcePack()) {
                 client.reloadResourcePacks();

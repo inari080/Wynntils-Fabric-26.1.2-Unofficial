@@ -152,12 +152,12 @@ public class LootrunScoreboardPart extends ScoreboardPart {
 
     @Override
     public void onSegmentRemove(ScoreboardSegment segment) {
-        // Do nothing here, we will know when the lootrun is over from patterns
+        Models.Lootrun.setState(LootrunningState.NOT_RUNNING, null);
     }
 
     @Override
     public void reset() {
-        // Do nothing here, we will know when the lootrun is over from patterns
+        Models.Lootrun.setState(LootrunningState.NOT_RUNNING, null);
     }
 
     @Override
