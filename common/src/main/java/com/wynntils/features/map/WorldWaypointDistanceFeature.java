@@ -103,17 +103,13 @@ public class WorldWaypointDistanceFeature extends Feature {
 
         for (MarkerInfo marker : markers) {
             Location location = marker.location();
-            Matrix4f projection = new Matrix4f(event.getProjectionMatrix());
+            Matrix4f projection = new Matrix4f(createLevelProjection());
             Camera camera = event.getCamera();
             Position cameraPos = camera.position();
 
             // apply camera rotation
-            Vector3f xp = new Vector3f(1, 0, 0);
-            Vector3f yp = new Vector3f(0, 1, 0);
-            Quaternionf xRotation = new Quaternionf().rotationAxis((float) Math.toRadians(camera.xRot()), xp);
-            Quaternionf yRotation = new Quaternionf().rotationAxis((float) Math.toRadians(camera.yRot() + 180f), yp);
-            projection.mul(new Matrix4f().rotation(xRotation));
-            projection.mul(new Matrix4f().rotation(yRotation));
+            Quaternionf viewRotation = new Quaternionf(camera.rotation()).conjugate();
+            Matrix4f viewProjection = projection.mul(new Matrix4f().rotation(viewRotation));
 
             // offset to put text to the center of the block
             float dx = (float) (location.x + 0.5 - cameraPos.x());
@@ -147,7 +143,7 @@ public class WorldWaypointDistanceFeature extends Feature {
                     playerDistance,
                     distanceText,
                     marker,
-                    worldToScreen(new Vector3f(dx, dy, dz), projection),
+                    worldToScreen(new Vector3f(dx, dy, dz), viewProjection),
                     marker.additionalText()));
         }
     }
@@ -468,6 +464,16 @@ public class WorldWaypointDistanceFeature extends Feature {
                 }
             }
         }
+    }
+
+    private static Matrix4f createLevelProjection() {
+        Window window = McUtils.window();
+        return new Matrix4f()
+                .perspective(
+                        (float) Math.toRadians(McUtils.options().fov().get()),
+                        (float) window.getGuiScaledWidth() / window.getGuiScaledHeight(),
+                        0.05F,
+                        McUtils.options().renderDistance().get() * 64.0F);
     }
 
     private record RenderedMarkerInfo(
