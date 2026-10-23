@@ -20,4 +20,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
       - name: Build Fabric JAR
         run: ./gradlew :fabric:shadowJar --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fabric-jar
+          path: fabric/build/libs/*.jar
 
