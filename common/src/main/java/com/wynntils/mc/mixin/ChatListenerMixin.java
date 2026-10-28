@@ -14,17 +14,29 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ChatListener.class)
 public abstract class ChatListenerMixin {
+    // Minecraft 26.1: the second boolean of handleSystemMessage is "remote", NOT "overlay".
+    // Action bar messages go through the separate handleOverlay(Component).
     @WrapMethod(method = "handleSystemMessage(Lnet/minecraft/network/chat/Component;Z)V")
-    private void handleSystemMessageWrap(Component message, boolean overlay, Operation<Void> original) {
-        SystemMessageEvent event = overlay
-                ? new SystemMessageEvent.GameInfoReceivedEvent(message)
-                : new SystemMessageEvent.ChatReceivedEvent(message);
+    private void handleSystemMessageWrap(Component message, boolean remote, Operation<Void> original) {
+        SystemMessageEvent event = new SystemMessageEvent.ChatReceivedEvent(message);
         MixinHelper.post(event);
 
         Component newMessage = event.isMessageChanged() ? event.getMessage() : message;
 
         if (!event.isCanceled()) {
-            original.call(newMessage, overlay);
+            original.call(newMessage, remote);
+        }
+    }
+
+    @WrapMethod(method = "handleOverlay(Lnet/minecraft/network/chat/Component;)V")
+    private void handleOverlayWrap(Component message, Operation<Void> original) {
+        SystemMessageEvent event = new SystemMessageEvent.GameInfoReceivedEvent(message);
+        MixinHelper.post(event);
+
+        Component newMessage = event.isMessageChanged() ? event.getMessage() : message;
+
+        if (!event.isCanceled()) {
+            original.call(newMessage);
         }
     }
 }
