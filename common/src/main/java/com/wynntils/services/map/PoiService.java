@@ -192,7 +192,9 @@ public class PoiService extends Service {
         for (CombatProfileList combatList : combatProfileLists) {
             CombatKind kind = CombatKind.fromString(combatList.type);
             // We load caves separately... until the refactor
-            if (kind != null && kind != CombatKind.CAVES) {
+            if (kind == CombatKind.CAVES) continue;
+
+            if (kind != null) {
                 for (CombatProfile profile : combatList.locations) {
                     combatPois.add(new CombatPoi(profile.coordinates, profile.name, kind));
                 }

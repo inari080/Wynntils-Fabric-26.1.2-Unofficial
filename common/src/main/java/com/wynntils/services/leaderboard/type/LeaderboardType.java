@@ -69,6 +69,7 @@ public enum LeaderboardType {
     GUILD_NOL("orphionSrGuilds", true),
     GUILD_TCC("colossusSrGuilds", true),
     GUILD_TNA("namelessSrGuilds", true),
+    GUILD_TOTAL_RAIDS("guildTotalRaids", true),
     GUILD_WTP("frumaSrGuilds", true);
 
     private final String key;

@@ -19,6 +19,7 @@ public enum ItemObtainType {
     MINIBOSS("miniboss", "Miniboss"),
     QUEST("quest", "Quest"),
     RAID("raid", "Raid"),
+    TIME_TRIAL("timeTrial", "Time Trial"),
 
     // Crowd sourced or determined via drop restriction
     CAVE_COMPLETION("caveCompletion", "Cave Completion"),

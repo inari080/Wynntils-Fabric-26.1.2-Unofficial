@@ -141,6 +141,11 @@ public final class EnumUtils {
         }
 
         private T replacement() {
+            T unknownValue = EnumUtils.searchEnum(enumClazz, "UNKNOWN");
+            if (unknownValue != null) {
+                WynntilsMod.warn("Will replace with UNKNOWN enum value");
+                return unknownValue;
+            }
             T firstValue = enumClazz.getEnumConstants()[0];
             WynntilsMod.warn("Will replace with first enum value: " + firstValue.name());
             return firstValue;

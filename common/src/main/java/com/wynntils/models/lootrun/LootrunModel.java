@@ -57,6 +57,7 @@ import com.wynntils.models.marker.MarkerModel;
 import com.wynntils.models.npc.label.NpcLabelInfo;
 import com.wynntils.models.worlds.event.WorldStateEvent;
 import com.wynntils.models.worlds.type.WorldState;
+import com.wynntils.utils.EnumUtils;
 import com.wynntils.utils.VectorUtils;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.LoreUtils;
@@ -252,8 +253,20 @@ public final class LootrunModel extends Model {
     }
 
     private void handleLootrunTaskLocations(Reader reader) {
-        Type type = new TypeToken<Map<LootrunLocation, Set<TaskLocation>>>() {}.getType();
-        taskLocations = Managers.Json.GSON.fromJson(reader, type);
+        Type type = new TypeToken<Map<String, Set<TaskLocation>>>() {}.getType();
+        Map<String, Set<TaskLocation>> rawMap = Managers.Json.GSON.fromJson(reader, type);
+        Map<LootrunLocation, Set<TaskLocation>> map = new HashMap<>();
+
+        for (Map.Entry<String, Set<TaskLocation>> entry : rawMap.entrySet()) {
+            LootrunLocation location = EnumUtils.fromJsonFormat(LootrunLocation.class, entry.getKey());
+            if (location != null && location != LootrunLocation.UNKNOWN) {
+                map.put(location, entry.getValue());
+            } else {
+                WynntilsMod.warn("Unknown lootrun location in task locations: " + entry.getKey());
+            }
+        }
+
+        taskLocations = map;
     }
 
     @SubscribeEvent
