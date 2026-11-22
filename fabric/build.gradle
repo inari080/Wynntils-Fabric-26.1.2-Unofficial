@@ -20,6 +20,9 @@ sourceSets.main.resources.srcDir("${rootDir}/common/src/main/resources")
 
 repositories {
     maven {
+        url "https://maven.neoforged.net/releases/"
+    }
+    maven {
         url "https://jitpack.io"
     }
     maven {

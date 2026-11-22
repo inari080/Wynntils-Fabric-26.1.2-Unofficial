@@ -39,6 +39,7 @@
     "ItemStackRenderStateMixin",
     "KeyboardHandlerMixin",
     "LevelRendererMixin",
+    "LightmapRenderStateExtractorMixin",
     "LivingEntityMixin",
     "LivingEntityRendererMixin",
     "LocalPlayerMixin",
